@@ -9,7 +9,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-  namespace = "uk.ac.tees.E4109732.MAM_BucketGame"
+  namespace = "uk.ac.tees.e4109732.mam_bucketgame"
   compileSdk = 35
   sourceSets {
     main {
@@ -50,7 +50,7 @@ android {
   }
 
   kotlin.compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-  
+
 }
 
 repositories {

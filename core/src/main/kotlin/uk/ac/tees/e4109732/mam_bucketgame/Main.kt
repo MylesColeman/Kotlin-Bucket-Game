@@ -1,7 +1,6 @@
-package uk.ac.tees.E4109732.MAM_BucketGame
+package uk.ac.tees.e4109732.mam_bucketgame
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
 import com.badlogic.gdx.graphics.g2d.Sprite
@@ -15,9 +14,7 @@ import ktx.app.clearScreen
 import ktx.assets.disposeSafely
 import ktx.assets.toInternalFile
 import ktx.async.KtxAsync
-import ktx.collections.size
 import ktx.graphics.use
-import kotlin.collections.set
 
 class Main : KtxGame<KtxScreen>() {
     override fun create() {
@@ -76,10 +73,10 @@ class FirstScreen : KtxScreen {
     override fun render(delta: Float) {
         handleInput()
         update(delta)
-        draw(delta)
+        draw()
     }
 
-    fun draw(delta: Float) {
+    fun draw() {
         clearScreen(red = 0.7f, green = 0.7f, blue = 0.7f)
 
         batch.use {
@@ -96,7 +93,7 @@ class FirstScreen : KtxScreen {
     }
 
     private fun handleInput() {
-        if(Gdx.input.isTouched()) {
+        if(Gdx.input.isTouched) {
                 touchPosition.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
                 viewPort.unproject(touchPosition)
                 bucketSprite.setCenterX(touchPosition.x)
@@ -105,7 +102,6 @@ class FirstScreen : KtxScreen {
 
     fun update(delta: Float) {
         val worldWidth = viewPort.worldWidth
-        val worldHeight = viewPort.worldHeight
         val bucketWidth = bucketSprite.width
         val bucketHeight = bucketSprite.height
 

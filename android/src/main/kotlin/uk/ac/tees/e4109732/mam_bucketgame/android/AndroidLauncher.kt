@@ -1,10 +1,10 @@
-package uk.ac.tees.E4109732.MAM_BucketGame.android
+package uk.ac.tees.e4109732.mam_bucketgame.android
 
 import android.os.Bundle
 
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
-import uk.ac.tees.E4109732.MAM_BucketGame.Main
+import uk.ac.tees.e4109732.mam_bucketgame.Main
 
 /** Launches the Android application. */
 class AndroidLauncher : AndroidApplication() {
