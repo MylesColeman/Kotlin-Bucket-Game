@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.app.KtxGame
@@ -14,6 +15,7 @@ import ktx.app.clearScreen
 import ktx.assets.disposeSafely
 import ktx.assets.toInternalFile
 import ktx.async.KtxAsync
+import ktx.collections.size
 import ktx.graphics.use
 import kotlin.collections.set
 
@@ -33,7 +35,7 @@ class FirstScreen : KtxScreen {
                 setFilter(Linear, Linear)
             }
 
-    private val backgroundMusic = Gdx.audio.newSound("music.mp3".toInternalFile())
+    private val backgroundMusic = Gdx.audio.newMusic("music.mp3".toInternalFile())
     private val bucketTexture =
         loadTexture("bucket.png").apply {
             setFilter(Linear, Linear)
@@ -44,7 +46,9 @@ class FirstScreen : KtxScreen {
             setSize(1f, 1f)
         }
 
+    private val bucketRectangle = com.badlogic.gdx.math.Rectangle()
 
+    private var dropTimer: Float = 0f
 
     private val dropTexture =
         loadTexture("drop.png")
@@ -52,10 +56,22 @@ class FirstScreen : KtxScreen {
                 setFilter(Linear, Linear)
             }
 
+    private val dropSprites = com.badlogic.gdx.utils.Array<Sprite>()
+
+    private val dropRectangle = com.badlogic.gdx.math.Rectangle()
+
     private val dropSound = Gdx.audio.newSound("drop.mp3".toInternalFile())
+
+    val touchPosition = Vector2()
     private val viewPort = FitViewport(8f, 5f)
 
     private val batch = SpriteBatch()
+
+    override fun show() {
+        backgroundMusic.isLooping = true
+        backgroundMusic.volume = 0.5f
+        backgroundMusic.play()
+    }
 
     override fun render(delta: Float) {
         handleInput()
@@ -72,23 +88,64 @@ class FirstScreen : KtxScreen {
             it.draw(backgroundTexture, 0f, 0f, viewPort.worldWidth, viewPort.worldHeight)
 
             bucketSprite.draw(it)
-        }
-    }
 
-    private fun handleInput() {
-        val touchPosition = Vector2()
-
-        if(Gdx.input.isTouched()) {
-            with(Gdx.input) {
-                touchPosition.set(x.toFloat(), y.toFloat())
-                viewPort.unproject(touchPosition)
-                bucketSprite.setCenterX(touchPosition.x)
+            for (dropSprite in dropSprites) {
+                dropSprite.draw(it)
             }
         }
     }
 
-    fun update(delta: Float) {
+    private fun handleInput() {
+        if(Gdx.input.isTouched()) {
+                touchPosition.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
+                viewPort.unproject(touchPosition)
+                bucketSprite.setCenterX(touchPosition.x)
+        }
+    }
 
+    fun update(delta: Float) {
+        val worldWidth = viewPort.worldWidth
+        val worldHeight = viewPort.worldHeight
+        val bucketWidth = bucketSprite.width
+        val bucketHeight = bucketSprite.height
+
+        bucketSprite.x = MathUtils.clamp(bucketSprite.x, 0f, worldWidth - bucketWidth)
+
+        bucketRectangle.set(bucketSprite.x, bucketSprite.y, bucketWidth, bucketHeight)
+
+        for (i in dropSprites.size - 1 downTo 0) {
+            val dropSprite = dropSprites.get(i)
+            val dropWidth = dropSprite.width
+            val dropHeight = dropSprite.height
+
+            dropSprite.translateY(-2f * delta)
+            dropRectangle.set(dropSprite.x, dropSprite.y, dropWidth, dropHeight)
+
+            if (dropSprite.y < -dropHeight) { dropSprites.removeIndex(i) }
+            else if (bucketRectangle.overlaps(dropRectangle)) {
+                dropSprites.removeIndex(i)
+                dropSound.play()
+            }
+        }
+
+        dropTimer += delta
+        if (dropTimer > 1f) {
+            dropTimer = 0f
+            createDroplet()
+        }
+    }
+
+    private fun createDroplet() {
+        val dropWidth = 1f
+        val dropHeight = 1f
+        val worldWidth = viewPort.worldWidth
+        val worldHeight = viewPort.worldHeight
+
+        val dropSprite = Sprite(dropTexture)
+        dropSprite.setSize(dropWidth, dropHeight)
+        dropSprite.x = MathUtils.random(0f, worldWidth - dropWidth)
+        dropSprite.y = worldHeight
+        dropSprites.add(dropSprite)
     }
 
     override fun resize(width: Int, height: Int) {
@@ -98,7 +155,9 @@ class FirstScreen : KtxScreen {
     override fun dispose() {
         backgroundTexture.disposeSafely()
         bucketTexture.disposeSafely()
+        dropTexture.disposeSafely()
         dropSound.disposeSafely()
+        backgroundMusic.disposeSafely()
         batch.disposeSafely()
     }
 
