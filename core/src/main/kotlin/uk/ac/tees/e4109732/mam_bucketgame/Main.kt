@@ -3,6 +3,7 @@ package uk.ac.tees.e4109732.mam_bucketgame
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
@@ -18,15 +19,22 @@ import ktx.async.KtxAsync
 import ktx.graphics.use
 
 class Main : KtxGame<KtxScreen>() {
+    val batch by lazy { SpriteBatch() }
+    val font by lazy { BitmapFont() }
+    val viewport = FitViewport(8f, 5f)
+
     override fun create() {
         KtxAsync.initiate()
 
-        addScreen(FirstScreen())
-        setScreen<FirstScreen>()
+        font.data.setScale(viewport.worldHeight / Gdx.graphics.height)
+        font.setUseIntegerPositions(false)
+
+        addScreen(MainMenuScreen(this))
+        setScreen<MainMenuScreen>()
     }
 }
 
-class FirstScreen : KtxScreen {
+class GameScreen(val game: Main) : KtxScreen {
     private val backgroundTexture = loadTexture("background.png")
     private val backgroundMusic = Gdx.audio.newMusic("music.mp3".toInternalFile())
 
@@ -39,10 +47,9 @@ class FirstScreen : KtxScreen {
     private val dropSprites = com.badlogic.gdx.utils.Array<Sprite>()
     private val dropRectangle = Rectangle()
     private val dropSound = Gdx.audio.newSound("drop.mp3".toInternalFile())
+    private var dropsGathered = 0
 
     val touchPosition = Vector2()
-    private val viewPort = FitViewport(8f, 5f)
-    private val batch = SpriteBatch()
 
     override fun show() {
         backgroundMusic.isLooping = true
@@ -57,18 +64,20 @@ class FirstScreen : KtxScreen {
     }
 
     fun draw() {
-        viewPort.apply()
+        game.viewport.apply()
         clearScreen(0f, 0f, 0f)
 
-        batch.use {
-            it.projectionMatrix = viewPort.camera.combined
+        game.batch.use { batch ->
+            batch.projectionMatrix = game.viewport.camera.combined
 
-            it.draw(backgroundTexture, 0f, 0f, viewPort.worldWidth, viewPort.worldHeight)
+            batch.draw(backgroundTexture, 0f, 0f, game.viewport.worldWidth, game.viewport.worldHeight)
 
-            bucketSprite.draw(it)
+            bucketSprite.draw(batch)
+
+            game.font.draw(batch, "Drops collected: $dropsGathered", 0f, game.viewport.worldHeight)
 
             for (dropSprite in dropSprites) {
-                dropSprite.draw(it)
+                dropSprite.draw(batch)
             }
         }
     }
@@ -77,14 +86,14 @@ class FirstScreen : KtxScreen {
         if(Gdx.input.isTouched) {
             with(Gdx.input) {
                 touchPosition.set(x.toFloat(), y.toFloat())
-                viewPort.unproject(touchPosition)
+                game.viewport.unproject(touchPosition)
                 bucketSprite.setCenterX(touchPosition.x)
             }
         }
     }
 
     fun update(delta: Float) {
-        bucketSprite.x = MathUtils.clamp(bucketSprite.x, 0f, viewPort.worldWidth - bucketSprite.width)
+        bucketSprite.x = MathUtils.clamp(bucketSprite.x, 0f, game.viewport.worldWidth - bucketSprite.width)
 
         updateDroplets(delta)
 
@@ -99,8 +108,8 @@ class FirstScreen : KtxScreen {
         dropSprites.add(
             Sprite(dropTexture).apply {
                 setSize(DROP_SIZE, DROP_SIZE)
-                x = MathUtils.random(0f, viewPort.worldWidth - DROP_SIZE)
-                y = viewPort.worldHeight
+                x = MathUtils.random(0f, game.viewport.worldWidth - DROP_SIZE)
+                y = game.viewport.worldHeight
             }
         )
     }
@@ -116,6 +125,7 @@ class FirstScreen : KtxScreen {
 
             if (dropSprite.y < -dropSprite.height) { dropSprites.removeIndex(i) }
             else if (bucketRectangle.overlaps(dropRectangle)) {
+                dropsGathered++
                 dropSprites.removeIndex(i)
                 dropSound.play()
             }
@@ -123,7 +133,7 @@ class FirstScreen : KtxScreen {
     }
 
     override fun resize(width: Int, height: Int) {
-        viewPort.update(width, height, true)
+        game.viewport.update(width, height, true)
     }
 
     override fun dispose() {
@@ -132,7 +142,6 @@ class FirstScreen : KtxScreen {
         dropTexture.disposeSafely()
         dropSound.disposeSafely()
         backgroundMusic.disposeSafely()
-        batch.disposeSafely()
     }
 
     companion object {
