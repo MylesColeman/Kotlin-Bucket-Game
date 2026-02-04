@@ -26,7 +26,7 @@ class Main : KtxGame<KtxScreen>() {
     override fun create() {
         KtxAsync.initiate()
 
-        font.data.setScale(viewport.worldHeight / Gdx.graphics.height)
+        font.data.setScale(0.04f)
         font.setUseIntegerPositions(false)
 
         addScreen(MainMenuScreen(this))
