@@ -1,7 +1,6 @@
 package uk.ac.tees.e4109732.mam_bucketgame
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
 import com.badlogic.gdx.graphics.g2d.Sprite
@@ -30,7 +29,7 @@ class Main : KtxGame<KtxScreen>() {
 class FirstScreen : KtxScreen {
     private val backgroundTexture = loadTexture("background.png")
     private val backgroundMusic = Gdx.audio.newMusic("music.mp3".toInternalFile())
-    
+
     private val bucketTexture = loadTexture("bucket.png")
     private val bucketSprite = Sprite(bucketTexture).apply { setSize(1f, 1f) }
     private val bucketRectangle = Rectangle()
@@ -138,7 +137,7 @@ class FirstScreen : KtxScreen {
 
     companion object {
         private const val DROP_SIZE = 1f
-        
+
         private fun loadTexture(fileName: String) = Texture(fileName.toInternalFile(), true).apply { setFilter(Linear, Linear) }
     }
 }
