@@ -77,7 +77,8 @@ class FirstScreen : KtxScreen {
     }
 
     fun draw() {
-        clearScreen(red = 0.7f, green = 0.7f, blue = 0.7f)
+        viewPort.apply()
+        clearScreen(0f, 0f, 0f)
 
         batch.use {
             it.projectionMatrix = viewPort.camera.combined
@@ -101,23 +102,17 @@ class FirstScreen : KtxScreen {
     }
 
     fun update(delta: Float) {
-        val worldWidth = viewPort.worldWidth
-        val bucketWidth = bucketSprite.width
-        val bucketHeight = bucketSprite.height
+        bucketSprite.x = MathUtils.clamp(bucketSprite.x, 0f, viewPort.worldWidth - bucketSprite.width)
 
-        bucketSprite.x = MathUtils.clamp(bucketSprite.x, 0f, worldWidth - bucketWidth)
-
-        bucketRectangle.set(bucketSprite.x, bucketSprite.y, bucketWidth, bucketHeight)
+        bucketRectangle.set(bucketSprite.x, bucketSprite.y, bucketSprite.width, bucketSprite.height)
 
         for (i in dropSprites.size - 1 downTo 0) {
             val dropSprite = dropSprites.get(i)
-            val dropWidth = dropSprite.width
-            val dropHeight = dropSprite.height
 
             dropSprite.translateY(-2f * delta)
-            dropRectangle.set(dropSprite.x, dropSprite.y, dropWidth, dropHeight)
+            dropRectangle.set(dropSprite.x, dropSprite.y, dropSprite.width, dropSprite.height)
 
-            if (dropSprite.y < -dropHeight) { dropSprites.removeIndex(i) }
+            if (dropSprite.y < -dropSprite.height) { dropSprites.removeIndex(i) }
             else if (bucketRectangle.overlaps(dropRectangle)) {
                 dropSprites.removeIndex(i)
                 dropSound.play()
@@ -132,15 +127,11 @@ class FirstScreen : KtxScreen {
     }
 
     private fun createDroplet() {
-        val dropWidth = 1f
-        val dropHeight = 1f
-        val worldWidth = viewPort.worldWidth
-        val worldHeight = viewPort.worldHeight
-
-        val dropSprite = Sprite(dropTexture)
-        dropSprite.setSize(dropWidth, dropHeight)
-        dropSprite.x = MathUtils.random(0f, worldWidth - dropWidth)
-        dropSprite.y = worldHeight
+        val dropSprite = Sprite(dropTexture).apply {
+            setSize(DROP_SIZE, DROP_SIZE)
+            x = MathUtils.random(0f, viewPort.worldWidth - DROP_SIZE)
+            y = viewPort.worldHeight
+        }
         dropSprites.add(dropSprite)
     }
 
@@ -158,6 +149,8 @@ class FirstScreen : KtxScreen {
     }
 
     companion object {
+        private const val DROP_SIZE = 1f
+        
         private fun loadTexture(fileName: String) = Texture(fileName.toInternalFile(), true)
     }
 }
