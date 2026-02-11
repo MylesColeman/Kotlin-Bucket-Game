@@ -16,10 +16,6 @@ This repository serves as a practical introduction to **Kotlin** and **Android S
 - `MainMenuScreen.kt`: Handling UI states and transitions.
 - `assets/`: Contains core 2D sprites and audio files used for collision feedback.
 
-## Platforms
-- `core`: Shared application logic module.
-- `android`: Android-specific platform launcher.
-
 ---
 
 A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
