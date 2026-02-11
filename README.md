@@ -1,4 +1,26 @@
-# MAM_BucketGame
+# MAM_BucketGame (WIP)
+
+This repository serves as a practical introduction to **Kotlin** and **Android Studio**, focusing on the fundamental components of mobile game development as part of my **Mobile and Multiplayer** module at **Teesside University**.
+
+*This repository will eventually be merged into a comprehensive Mobile & Multiplayer game demo collection.*
+
+---
+
+## Technical Focus
+* **Mobile Input Systems**: Implementation of touch-based controls and coordinate mapping for mobile screens.
+* **Game Loop Management**: Establishing a consistent update/render cycle using the LibGDX framework.
+* **Resource Handling**: Managing assets including textures and audio (SFML-style logic translated to Kotlin).
+
+## Project Structure
+- `Main.kt`: Entry point for the game logic and screen management.
+- `MainMenuScreen.kt`: Handling UI states and transitions.
+- `assets/`: Contains core 2D sprites and audio files used for collision feedback.
+
+## Platforms
+- `core`: Shared application logic module.
+- `android`: Android-specific platform launcher.
+
+---
 
 A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
 
