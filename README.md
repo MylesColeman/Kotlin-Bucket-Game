@@ -1,4 +1,4 @@
-# MAM_BucketGame (WIP)
+# MAM_BucketGame
 
 This repository serves as a practical introduction to **Kotlin** and **Android Studio**, focusing on the fundamental components of mobile game development as part of my **Mobile and Multiplayer** module at **Teesside University**.
 
